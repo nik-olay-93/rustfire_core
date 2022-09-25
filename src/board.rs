@@ -3,13 +3,48 @@ use uuid::Uuid;
 pub struct Board {
     pub player1: PSide,
     pub player2: PSide,
+    pub spawn_order: Vec<Uuid>,
+}
+
+impl Board {
+    pub fn new() -> Self {
+        Board {
+            player1: PSide::new(),
+            player2: PSide::new(),
+            spawn_order: Vec::new(),
+        }
+    }
+}
+
+impl PSide {
+    pub fn new() -> Self {
+        Self {
+            hero: HeroSlot::None,
+            hero_power: HeroPowerSlot::None,
+            // TODO: Come up with a better way to do this
+            minions: [
+                MinionSlot::None,
+                MinionSlot::None,
+                MinionSlot::None,
+                MinionSlot::None,
+                MinionSlot::None,
+                MinionSlot::None,
+                MinionSlot::None,
+            ],
+            mana: 0,
+            max_mana: 0,
+            on_turn_start: Vec::new(),
+            on_turn_end: Vec::new(),
+        }
+    }
 }
 
 pub struct PSide {
     pub hero: HeroSlot,
     pub hero_power: HeroPowerSlot,
-    pub mininions: [MinionSlot; 7],
+    pub minions: [MinionSlot; 7],
     pub mana: u8,
+    pub max_mana: u8,
     pub on_turn_start: Vec<Effect>,
     pub on_turn_end: Vec<Effect>,
 }
@@ -53,7 +88,8 @@ pub trait Minion {
 
     fn reduce_attack(&mut self, attack: u8);
 
-    fn summon(&self, board: &mut Board, player: &mut PSide, enemy: &mut PSide, slot: usize);
+    fn on_summon(&mut self, board: &mut Board, player: &mut PSide, enemy: &mut PSide, slot: usize);
+    fn on_remove(&mut self, board: &mut Board, player: &mut PSide, enemy: &mut PSide, slot: usize);
     fn trigger_battlecry(
         &mut self,
         board: &mut Board,
