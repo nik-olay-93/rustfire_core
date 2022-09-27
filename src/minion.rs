@@ -141,6 +141,81 @@ impl Minion {
             remove(self, board, player, enemy, slot);
         }
     }
+
+    pub fn trigger_before_attack(
+        &mut self,
+        board: &mut Board,
+        player: &mut PSide,
+        enemy: &mut PSide,
+        slot: usize,
+        target: usize,
+    ) {
+        if let Some(before_attack) = self.before_attack {
+            before_attack(self, board, player, enemy, slot, target);
+        }
+    }
+    pub fn trigger_after_attack(
+        &mut self,
+        board: &mut Board,
+        player: &mut PSide,
+        enemy: &mut PSide,
+        slot: usize,
+        target: usize,
+    ) {
+        if let Some(after_attack) = self.after_attack {
+            after_attack(self, board, player, enemy, slot, target);
+        }
+    }
+
+    pub fn trigger_before_attacked(
+        &mut self,
+        board: &mut Board,
+        player: &mut PSide,
+        enemy: &mut PSide,
+        slot: usize,
+        attacker: usize,
+    ) {
+        if let Some(before_attacked) = self.before_attacked {
+            before_attacked(self, board, player, enemy, slot, attacker);
+        }
+    }
+    pub fn trigger_after_attacked(
+        &mut self,
+        board: &mut Board,
+        player: &mut PSide,
+        enemy: &mut PSide,
+        slot: usize,
+        attacker: usize,
+    ) {
+        if let Some(after_attacked) = self.after_attacked {
+            after_attacked(self, board, player, enemy, slot, attacker);
+        }
+    }
+
+    pub fn trigger_before_another_attack(
+        &mut self,
+        board: &mut Board,
+        player: &mut PSide,
+        enemy: &mut PSide,
+        slot: usize,
+        target: usize,
+    ) {
+        if let Some(before_another_attack) = self.before_another_attack {
+            before_another_attack(self, board, player, enemy, slot, target);
+        }
+    }
+    pub fn trigger_after_another_attack(
+        &mut self,
+        board: &mut Board,
+        player: &mut PSide,
+        enemy: &mut PSide,
+        slot: usize,
+        target: usize,
+    ) {
+        if let Some(after_another_attack) = self.after_another_attack {
+            after_another_attack(self, board, player, enemy, slot, target);
+        }
+    }
 }
 
 #[derive(Clone)]
