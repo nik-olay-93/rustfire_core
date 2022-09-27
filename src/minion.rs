@@ -7,6 +7,8 @@ pub struct Minion {
     pub id: String,
     pub uuid: Option<Uuid>,
 
+    pub name: String,
+
     pub base_cost: u8,
     pub cost: u8,
 
