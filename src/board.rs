@@ -49,6 +49,12 @@ impl Debug for Board {
     }
 }
 
+impl Default for Board {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct PSide {
     minionslots: Vec<BoardSlot>,
 }
@@ -97,7 +103,7 @@ impl Debug for PSide {
             }
         }
 
-        writeln!(f, "")?;
+        writeln!(f)?;
 
         for (_, slot) in self.minionslots.iter().enumerate() {
             if let BoardSlot::Minion(minion) = slot {
@@ -105,9 +111,15 @@ impl Debug for PSide {
             }
         }
 
-        writeln!(f, "")?;
+        writeln!(f)?;
 
         Ok(())
+    }
+}
+
+impl Default for PSide {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

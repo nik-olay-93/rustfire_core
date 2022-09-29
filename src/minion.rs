@@ -49,3 +49,9 @@ impl Minion {
         min
     }
 }
+
+impl Default for Minion {
+    fn default() -> Self {
+        Self::new()
+    }
+}
