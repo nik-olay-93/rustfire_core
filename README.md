@@ -6,4 +6,4 @@ Hearthstone emulator written in Rust.
 
 Contains rust library.
 
-For application, see [rustfire-app](https://github.com/nik-olay-93/rustfire_app).
+For application, see [rustfire_app](https://github.com/nik-olay-93/rustfire_app).
