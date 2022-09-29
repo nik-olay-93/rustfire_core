@@ -30,6 +30,14 @@ impl Board {
 
         Ok(())
     }
+
+    pub fn minion_count(&self, player: u8) -> Result<usize, String> {
+        match player {
+            1 => Ok(self.player1.minion_count()),
+            2 => Ok(self.player2.minion_count()),
+            _ => Err("Invalid player number".to_owned()),
+        }
+    }
 }
 
 impl Debug for Board {
