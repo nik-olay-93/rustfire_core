@@ -141,12 +141,11 @@ impl Board {
         let mut dead_minions = Vec::new();
 
         for min in self.minions.iter() {
-            let side;
-            match min.1 {
-                1 => side = &mut self.player1,
-                2 => side = &mut self.player2,
+            let side = match min.1 {
+                1 => &mut self.player1,
+                2 => &mut self.player2,
                 _ => continue,
-            }
+            };
 
             let minion = match side.get_minion(min.2) {
                 Some(minion) => minion,
@@ -154,7 +153,7 @@ impl Board {
             };
 
             if minion.health <= 0 {
-                dead_minions.push(min.clone());
+                dead_minions.push(min.to_owned());
             }
         }
     }
@@ -164,12 +163,11 @@ impl Board {
         let mut dead_minions = Vec::new();
 
         for min in self.minions.iter() {
-            let side;
-            match min.1 {
-                1 => side = &mut self.player1,
-                2 => side = &mut self.player2,
+            let side = match min.1 {
+                1 => &mut self.player1,
+                2 => &mut self.player2,
                 _ => continue,
-            }
+            };
 
             let minion = match side.get_minion(min.2) {
                 Some(minion) => minion,
@@ -177,17 +175,16 @@ impl Board {
             };
 
             if minion.health <= 0 {
-                dead_minions.push(min.clone());
+                dead_minions.push(min.to_owned());
             }
         }
 
         for min in dead_minions.iter() {
-            let side;
-            match min.1 {
-                1 => side = &mut self.player1,
-                2 => side = &mut self.player2,
+            let side = match min.1 {
+                1 => &mut self.player1,
+                2 => &mut self.player2,
                 _ => continue,
-            }
+            };
 
             side.remove_minion(min.2).unwrap_or_default();
 
