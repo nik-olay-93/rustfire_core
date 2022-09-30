@@ -13,7 +13,7 @@ pub struct Minion {
 
     pub cost: u128,
     pub attack: u128,
-    pub health: u128,
+    pub health: i128,
 
     pub on_summon: Option<fn(&mut Board, side: u8, slot: usize)>,
 }
@@ -47,6 +47,15 @@ impl Minion {
         min.health = 1;
 
         min
+    }
+
+    pub fn attack(&mut self, target: &mut Minion) {
+        target.take_damage(self.attack);
+        self.take_damage(target.attack);
+    }
+
+    pub fn take_damage(&mut self, damage: u128) {
+        self.health -= damage as i128;
     }
 }
 

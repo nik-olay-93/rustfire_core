@@ -90,6 +90,52 @@ impl Board {
         Ok(uuid)
     }
 
+    /// Attacks a minion on the board.
+    ///
+    /// # Arguments
+    ///
+    /// * `attacker` - (player, slot) of the attacking minion.
+    /// * `defender` - (player, slot) of the defending minion.
+    ///
+    /// # Returns
+    ///
+    /// * `Ok(())` - The attack was successful.
+    /// * `Err(String)` - The error message, if either minion does not exist.
+    pub fn minion_attack(
+        &mut self,
+        attacker: (u8, usize),
+        target: (u8, usize),
+    ) -> Result<(), String> {
+        let (attacker_minion, target_minion) = match (attacker.0, target.0) {
+            (1, 1) => {
+                self.player1.minion_attack_friendly(attacker.1, target.1)?;
+                (None, None)
+            }
+            (2, 2) => {
+                self.player2.minion_attack_friendly(attacker.1, target.1)?;
+                (None, None)
+            }
+            (1, 2) => (
+                self.player1.get_minion(attacker.1),
+                self.player2.get_minion(target.1),
+            ),
+            (2, 1) => (
+                self.player2.get_minion(attacker.1),
+                self.player1.get_minion(target.1),
+            ),
+            (_, _) => return Err("Invalid player number".to_owned()),
+        };
+
+        if let (Some(attacker_minion), Some(target_minion)) = (attacker_minion, target_minion) {
+            attacker_minion.attack(target_minion);
+        }
+
+        self.deathrattle_dead();
+        self.remove_dead();
+
+        Ok(())
+    }
+
     /// Triggers all dead minions' deathrattles.
     pub fn deathrattle_dead(&mut self) {
         let mut dead_minions = Vec::new();
@@ -200,6 +246,26 @@ impl PSide {
         }
     }
 
+    /// Returns clone of minion in given slot.
+    ///
+    /// Use this if you don't need to mutate the minion.
+    ///
+    /// # Arguments
+    ///
+    /// * `slot` - The slot to get the minion from.
+    ///
+    /// # Returns
+    ///
+    /// * `Some(Minion)` - The minion in the slot.
+    /// * `None` - If the slot is empty or out of bounds.
+    pub fn get_minion_clone(&self, slot: usize) -> Option<Minion> {
+        if let Some(BoardSlot::Minion(minion)) = self.minionslots.get(slot) {
+            Some(minion.clone())
+        } else {
+            None
+        }
+    }
+
     /// Summons given minion to the side of the board.
     ///
     /// # Arguments
@@ -227,6 +293,43 @@ impl PSide {
         Ok(uuid)
     }
 
+    /// Performs an attack with the minion in the given slot.
+    ///
+    /// # Arguments
+    ///
+    /// * `attacker` - The slot of the minion to attack with.
+    /// * `target` - The slot of the minion to attack.
+    ///
+    /// # Returns
+    ///
+    /// * `Ok(())` - If the attack was successful.
+    /// * `Err(String)` - The error message, if the attack was not successful.
+    pub fn minion_attack_friendly(&mut self, attacker: usize, target: usize) -> Result<(), String> {
+        let mut attacker_minion = match self.minionslots.get_mut(attacker) {
+            Some(BoardSlot::Minion(minion)) => minion.clone(),
+            Some(_) => return Err("Invalid attacker slot".to_owned()),
+            None => return Err("Invalid attacker slot".to_owned()),
+        };
+
+        let mut target_minion = match self.minionslots.get_mut(target) {
+            Some(BoardSlot::Minion(minion)) => minion.clone(),
+            Some(_) => return Err("Invalid attacker slot".to_owned()),
+            None => return Err("Invalid attacker slot".to_owned()),
+        };
+
+        attacker_minion.attack(&mut target_minion);
+
+        if let Some(refr) = self.minionslots.get_mut(attacker) {
+            *refr = BoardSlot::Minion(attacker_minion);
+        }
+
+        if let Some(refr) = self.minionslots.get_mut(target) {
+            *refr = BoardSlot::Minion(target_minion);
+        }
+
+        Ok(())
+    }
+
     /// Removes minion from given slot.
     pub fn remove_minion(&mut self, slot: usize) -> Result<(), String> {
         if self.minionslots.len() < slot {
@@ -234,6 +337,18 @@ impl PSide {
         }
 
         self.minionslots.remove(slot);
+        Ok(())
+    }
+
+    pub fn deal_damage_to_minion(&mut self, slot: usize, damage: u128) -> Result<(), String> {
+        if self.minionslots.len() < slot {
+            return Err("Invalid slot number".to_owned());
+        }
+
+        if let Some(BoardSlot::Minion(minion)) = self.minionslots.get_mut(slot) {
+            minion.take_damage(damage);
+        }
+
         Ok(())
     }
 }
